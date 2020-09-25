@@ -33,6 +33,8 @@ var bot *tgbotapi.BotAPI
 
 type utmails []utmail
 
+var startTime time.Time
+
 var lessons = map[string]string{
 	"3991810128301": "سیستم_عامل",
 	"3991810139702": "هوش_مصنوعی",
@@ -41,10 +43,11 @@ var lessons = map[string]string{
 	"3991810153601": "CAD",
 	"3991810157401": "کامپایلر",
 	"3991810121801": "سیستم_هوشمند",
+	"3991810114901": "نرم۱",
 }
 
 func main() {
-
+	startTime = time.Now().Local().Add(-1 * time.Hour)
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("Recovered in main", r)
@@ -179,7 +182,6 @@ func getMails(username string, password string) utmails {
 	if err := c.Login(username, password); err != nil {
 		log.Println("Error:", err)
 		return mails
-
 	}
 
 	// Select INBOX mailbox
@@ -193,6 +195,7 @@ func getMails(username string, password string) utmails {
 	// Search for unseen messages
 	criteria := imap.NewSearchCriteria()
 	criteria.WithoutFlags = []string{"\\Seen"}
+	criteria.SentSince = startTime
 	uids, err := c.Search(criteria)
 	if len(uids) == 0 {
 		return utmails{}
