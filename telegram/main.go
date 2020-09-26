@@ -122,6 +122,11 @@ func sendMailsMessage(chatID int64, maleList mail.Emails) {
 		}
 		text += "<b>" + mail.Subject + "</b>\n\n"
 		text += mail.Body
+
+		// Telegram has a limit of 4096 bytes for a message
+		if len(text) >= 2000 {
+			text = text[0:1900] + "\n\n متن طولانی/در ایمیل اصلی بررسی شود"
+		}
 		msg := tgbotapi.NewMessage(chatID, text)
 		msg.ParseMode = "HTML"
 		bot.Send(msg)
